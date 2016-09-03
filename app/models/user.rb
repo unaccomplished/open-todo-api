@@ -12,4 +12,8 @@ class User < ActiveRecord::Base
   has_secure_password
 
   has_many :lists, dependent: :destroy
+
+  def full_name
+    self.name
+  end
 end
