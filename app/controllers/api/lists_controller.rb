@@ -26,20 +26,20 @@ class Api::ListsController < ApiController
     if list.update(list_params)
       render json: list
     else
-      render json: { errors: list.errors.full_messages }, status: unprocessable_entity
+      render json: { errors: list.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   private
 
   def list_params
-    params.require(:list).permit(:title, :user_id, :private)
+    params.require(:list).permit(:title, :user_id, :permissions)
   end
 
   def list_privacy
     list = List.find(params[:id])
-    if list.private?
-      render json: { errors: list.errors.full_messages }, status: unprocessable_entity
+    if list.admin_only?
+      render json: { error: "Cannot update List with admin only permissions" }, status: :unprocessable_entity
     end
   end
 
