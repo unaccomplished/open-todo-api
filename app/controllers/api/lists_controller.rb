@@ -1,5 +1,6 @@
 class Api::ListsController < ApiController
   before_action :authenticated?
+  before_action :list_privacy, only: :update
 
   def create
     list = List.new(list_params)
@@ -20,10 +21,26 @@ class Api::ListsController < ApiController
     end
   end
 
+  def update
+    list = List.find(params[:id])
+    if list.update(list_params)
+      render json: list
+    else
+      render json: { errors: list.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def list_params
-    params.require(:list).permit(:title, :user_id)
+    params.require(:list).permit(:title, :user_id, :permissions)
+  end
+
+  def list_privacy
+    list = List.find(params[:id])
+    if list.admin_only?
+      render json: { error: "Cannot update List with admin only permissions" }, status: :unprocessable_entity
+    end
   end
 
 end
