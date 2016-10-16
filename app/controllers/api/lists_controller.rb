@@ -2,6 +2,34 @@ class Api::ListsController < ApiController
   before_action :authenticated?
   before_action :list_privacy, only: :update
 
+  swagger_controller :lists, "List Management"
+
+  swagger_api :create do
+    summary "Creates a new List"
+    param :form, :title, :string, :required, "Title"
+    param :form, :user_id, :integer, :required, "User Id"
+    param_list :form, :permissions, :string, :required, "Permissions", [ "open", "viewable", "admin_only" ]
+    response :unauthorized
+    response :not_acceptable
+  end
+
+  swagger_api :destroy do
+    summary "Deletes an existing List"
+    param :path, :id, :integer, :optional, "List Id"
+    response :unauthorized
+    response :not_found
+  end
+
+  swagger_api :update do
+    summary "Updates an existing List"
+    param :form, :title, :string, :required, "Title"
+    param :form, :user_id, :integer, :optional, "User Id"
+    param_list :form, :permissions, :string, :optional, "Permissions", [ "open", "viewable", "admin_only" ]
+    response :unauthorized
+    response :not_found
+    response :not_acceptable
+  end
+
   def create
     list = List.new(list_params)
     if list.save

@@ -1,6 +1,35 @@
 class Api::UsersController < ApiController
   before_action :authenticated?
 
+  swagger_controller :users, "User Management"
+
+  swagger_api :index do
+    summary "Fetches all User items"
+    notes "This lists all the active users"
+    param :query, :page, :integer, :optional, "Page number"
+    param :path, :nested_id, :integer, :optional, "Team Id"
+    response :unauthorized
+    response :not_acceptable, "The request you made is not acceptable"
+    response :requested_range_not_satisfiable
+  end
+
+  swagger_api :create do
+    summary "Creates a new User"
+    param :form, :name, :string, :required, "Name"
+    param :form, :email, :string, :required, "Email"
+    param :form, :password_digest, :string, :required, "Password"
+    param :form, :bio, :text, :optional, "Bio"
+    response :unauthorized
+    response :not_acceptable
+  end
+
+  swagger_api :destroy do
+    summary "Deletes an existing User item"
+    param :path, :id, :integer, :optional, "User Id"
+    response :unauthorized
+    response :not_found
+  end
+
   def index
     users = User.all
 
